@@ -1,8 +1,8 @@
 const {Sequelize, sequelize} = require('./db');
 
-const User = sequelize.define('user', {
+const Author = sequelize.define('author', {
   username: Sequelize.STRING,
   password: Sequelize.STRING
 });
 
-module.exports = { User };
+module.exports = { Author };

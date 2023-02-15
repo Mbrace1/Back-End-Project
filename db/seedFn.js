@@ -1,10 +1,12 @@
 const {sequelize} = require('./db');
-const {Kitten} = require('./');
-const {kittens} = require('./seedData');
+const {BlogEntry} = require('./BlogEntry');
+const {Author} = require('./Author');
+const {blogEntries, authors} = require('./seedData');
 
 const seed = async () => {
   await sequelize.sync({ force: true }); // recreate db
-  await Kitten.bulkCreate(kittens);
+  await BlogEntry.bulkCreate(blogEntries);
+  await Author.bulkCreate(authors);
 };
 
 module.exports = seed;

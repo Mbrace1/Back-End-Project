@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
-const { User } = require('./db');
+const {buildDB} = require('./db/seed')
+const { Author, BlogEntry } = require('./db')
+buildDB()
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -28,14 +30,14 @@ app.get('/', async (req, res, next) => {
 // POST /login
 // OPTIONAL - takes req.body of {username, password}, finds user by username, and compares the password with the hashed version from the DB
 
-// GET /kittens/:id
-// TODO - takes an id and returns the cat with that id
+// GET /blogEntry/:id
+// TODO - takes an id and returns the blogEntry with that id
 
-// POST /kittens
-// TODO - takes req.body of {name, age, color} and creates a new cat with the given name, age, and color
+// POST /blogEntry
+// TODO - takes req.body of {name, age, color} and creates a new blogEntry with the given name, age, and color
 
-// DELETE /kittens/:id
-// TODO - takes an id and deletes the cat with that id
+// DELETE /blogEntry/:id
+// TODO - takes an id and deletes the blogEntry with that id
 
 // error handling middleware, so failed tests receive them
 app.use((error, req, res, next) => {

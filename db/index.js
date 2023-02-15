@@ -1,13 +1,13 @@
-const {Kitten} = require('./Kitten');
-const {User} = require('./User');
+const {BlogEntry} = require('./BlogEntry');
+const {Author} = require('./Author');
 const {sequelize, Sequelize} = require('./db');
 
-Kitten.belongsTo(User, {foreignKey: 'ownerId'}); // Kitten table, there will be an ownerId <- FK
-User.hasMany(Kitten);
+Author.hasMany(BlogEntry);
+BlogEntry.belongsTo(Author, {id: 'ownerId'}); // blogEntry table, there will be an ownerId <- FK
 
 module.exports = {
-    Kitten,
-    User,
+    BlogEntry,
+    Author,
     sequelize,
     Sequelize
 };

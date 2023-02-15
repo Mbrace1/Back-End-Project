@@ -1,52 +1,58 @@
-const kittens = [
+const blogEntries = [
   {
-    name: "Kit-Kat",
-    color: "brown",
-    age: 6,
+    title: "How to draw",
+    tag: "drawing",
+    body: "Pick up a pencil and draw",
+    ownerId: 1
   },
   {
-    name: "Cindy Clawford",
-    color: "white",
-    age: 6,
+    title: "First steps to eating food",
+    tag: "food",
+    body: "Find something to eat, open your mouth and bite into it.",
+    ownerId: 2
   },
   {
-    name: "Clawdia Catzy",
-    color: "silver",
-    age: 4,
+    title: "Are you sure that you're human?",
+    tag: "self-discovery",
+    body: "Have you ever wondered if you are really a human? Lets find out together for only £4.99 when you buy my latest...",
+    ownerId: 3
   },
   {
-    name: "Ricky Ticky Tabby",
-    color: "black",
-    age: 7,
+    title: "Why you should get into cycling backwards",
+    tag: "cycling",
+    body: "Have you ever cycled past something and realised you just missed out on something incredible? Well let me tell you how I learnt to cycle backwards...",
+    ownerId: 1
   },
   {
-    name: "Bitty Billy Bubbles",
-    color: "grey",
-    age: 1,
+    title: "Counting to infinity and what I learnt",
+    tag: "numbers",
+    body: "This may be my biggest accomplishment in life so far and I want to share my journey with you, but we might be here a while so grab a snack...",
+    ownerId: 1
   },
   {
-    name: "Quimby mcQuimbleson",
-    color: "orange",
-    age: 2,
+    title: "Catching that pesky neighbour in your bins again",
+    tag: "neighbourhood",
+    body: "How did they end up in there again?",
+    ownerId: 2
   }
 ];
 
-const users = [
+const authors = [
   {
-    username: "brett",
-    password: "brettpass"
+    username: "Bill",
+    password: "amazingPassword"
   },
   {
-    username: "antonette",
-    password: "headfirst"
+    username: "Ana",
+    password: "wordPass"
   },
   {
-    username: "karianne",
-    password: "scarykary"
+    username: "Steve",
+    password: "123"
   }
 ]
 
 module.exports = {
-  kittens,
-  users
+  blogEntries,
+  authors
 }
