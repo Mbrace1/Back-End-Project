@@ -11,7 +11,7 @@ app.get('/', async (req, res, next) => {
   try {
     res.send(`
       <h1>Welcome to Super Interesting Blogging</h1>
-      <p>Blogs are available at <a href="/blogs">/blogs</a></p>
+      <p>View all our <a href="/blogs">blogs</a></p>
       <p>Create a new cat at <b><code>POST /kittens</code></b> and delete one at <b><code>DELETE /kittens/:id</code></b></p>
       <p>Log in via POST /login or register via POST /register</p>
     `);
@@ -52,6 +52,50 @@ app.get("/blogs/:id", async(req, res) => {
   }
 
 })
+
+// CREATE BLOG
+app.post("/blogs/create/", async(req, res) => {
+  try {
+    const { title, tag, body, ownerId } = req.body;
+    const createBlog =  await Kitten.create({
+      title,
+      tag,
+      body,
+      ownerId
+    });
+
+    res.send(createBlog);
+
+  } catch (error) {
+    console.error("blogs: createOne", error);
+    next(error);
+  }
+
+})
+
+// DELETE BLOG
+app.delete("/blogs/delete/:id", async(req, res) => {
+  try {
+    const {id} = req.params;
+    const deleteBlog = await BlogEntry.findOne( { where: {id : id} });
+
+    if (!deleteBlog) {
+      res.send("Blog not found.");
+      return;
+    }
+
+    await deleteBlog.destroy();
+    res.send("Blog deleted.");
+
+  } catch (error) {
+    console.error("blogs: deleteOne", error);
+    next(error);
+  }
+
+})
+
+// Next want to be able to create a user (sign up) and only create blogs when logged in
+
 
 // error handling middleware, so failed tests receive them
 app.use((error, req, res, next) => {
