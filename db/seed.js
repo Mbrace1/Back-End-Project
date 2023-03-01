@@ -11,7 +11,7 @@ let buildDB = async () => {
       console.error(err);
     })
     .finally(() => {
-      sequelize.close();
+      // sequelize.close();
     });
 }
 
