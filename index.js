@@ -57,7 +57,7 @@ app.get("/blogs/:id", async(req, res) => {
 app.post("/blogs/create/", async(req, res) => {
   try {
     const { title, tag, body, ownerId } = req.body;
-    const createBlog =  await Kitten.create({
+    const createBlog =  await BlogEntry.create({
       title,
       tag,
       body,
