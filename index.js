@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const {buildDB} = require('./db/seed')
 const { Author, BlogEntry } = require('./db')
+const bycrpyt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 buildDB()
 
 app.use(express.json());
@@ -85,8 +88,8 @@ app.delete("/blogs/delete/:id", async(req, res) => {
     }
 
     await deleteBlog.destroy();
-    res.send("Blog deleted.");
-
+    res.send("This blog was deleted.");
+ 
   } catch (error) {
     console.error("blogs: deleteOne", error);
     next(error);
@@ -94,8 +97,85 @@ app.delete("/blogs/delete/:id", async(req, res) => {
 
 })
 
-// Next want to be able to create a user (sign up) and only create blogs when logged in
+// EDIT BLOG - not working atm
+app.put("/blogs/edit/:id", async(req, res) => {
+  try {
+    const { title, tag, body, ownerId } = req.body;
 
+    const editBlog = await BlogEntry.findOne( { where: {id : id} });
+    // const oldCopy = await BlogEntry.findOne( { where: {id : id} });
+
+    if (!editBlog) {
+      res.send("Blog not found.");
+      return;
+    }
+
+    await editBlog.update({
+      title,
+      tag,
+      body,
+      ownerId
+    });
+
+    res.send(editBlog);
+ 
+  } catch (error) {
+    console.error("blogs: editOne", error);
+    next(error);
+  }
+
+})
+
+
+// Next want to be able to create a user (sign up) and only create blogs when logged in
+// CREATE USER / sign up
+app.post("/authors/create/", async(req, res) => {
+  try {
+    const author = await Author.findOne( { where: {username} });
+
+    if (author) {
+      res.send("This username has been taken.");
+      return;
+    }
+
+    const { username, password } = req.body;
+    const hashedPW = await bycrpyt.hash(password, 8)
+    const newAuthor =  await Author.create({
+      username,
+      hashedPW,
+    });
+    const token = jwt.sign({id, username}, process.env.SIGN_SECRET)
+
+    res.send(newAuthor.username + "has been created, here is your unique token " + token);
+
+  } catch (error) {
+    console.error("blogs: createOne", error);
+    next(error);
+  }
+})
+
+// LOGIN AS USER
+app.post("/authors/login/", async(req, res) => {
+  try {
+    const { username, password } = req.body;
+    const { id, password: hashedPW } = await User.findOne({
+      where: { username },
+    });
+
+    if (id) {
+      const isMatch = await bcrypt.compare(password, hashedPW);
+      if (isMatch) {
+        const token = jwt.sign({ id, username }, process.env.SIGN_SECRET);
+        res.send({ message: "success", token });
+        return;
+      }
+    }
+    res.send("Unauthorized");
+  } catch (error) {
+    console.error("blogs: createOne", error);
+    next(error);
+  }
+})
 
 // error handling middleware, so failed tests receive them
 app.use((error, req, res, next) => {
