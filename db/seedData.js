@@ -9,7 +9,7 @@ const blogEntries = [
     title: "First steps to eating food",
     tag: "food",
     body: "Find something to eat, open your mouth and bite into it.",
-    authorId: 1
+    authorId: 3
   },
   {
     title: "Are you sure that you're human?",

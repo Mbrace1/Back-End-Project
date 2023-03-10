@@ -32,7 +32,7 @@ app.get('/', async (req, res) => {
 
 
 // GET ALL BLOGS
-app.get("/blogs/", async(req, res) => {
+app.get("/all-blogs/", async(req, res) => {
   try {
     const blogs = await BlogEntry.findAll({ include: [{
         model: Author,
@@ -46,7 +46,7 @@ app.get("/blogs/", async(req, res) => {
 })
 
 // GET SPECIFIC BLOG
-app.get("/blogs/:id", async(req, res) => {
+app.get("/blog/:id", async(req, res) => {
   try {
     const {id} = req.params;
     const specificBlog = await BlogEntry.findOne( { where: {id : id} });
