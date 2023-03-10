@@ -2,15 +2,22 @@ const express = require('express');
 const app = express();
 const {buildDB} = require('./db/seed')
 const { Author, BlogEntry } = require('./db')
-const bycrpyt = require('bcrypt')
-const jwt = require('jsonwebtoken')
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const { setUser, requiresAuth } = require("./middleware");
+const { SIGN_SECRET } = process.env;
 require('dotenv').config()
 buildDB()
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
-app.get('/', async (req, res, next) => {
+app.use(setUser);
+// routes to use authentication
+app.use("/blogs", requiresAuth);
+
+
+app.get('/', async (req, res) => {
   try {
     res.send(`
       <h1>Welcome to Super Interesting Blogging</h1>
@@ -20,7 +27,6 @@ app.get('/', async (req, res, next) => {
     `);
   } catch (error) {
     console.error(error);
-    next(error)
   }
 });
 
@@ -28,11 +34,14 @@ app.get('/', async (req, res, next) => {
 // GET ALL BLOGS
 app.get("/blogs/", async(req, res) => {
   try {
-    const blogs = await BlogEntry.findAll();
+    const blogs = await BlogEntry.findAll({ include: [{
+        model: Author,
+        as: 'username',
+        attributes: ['username']
+    }] });
     res.send(blogs);
   } catch (error) {
     console.error("blogs: getAll", error);
-    next(error);
   }
 })
 
@@ -51,7 +60,6 @@ app.get("/blogs/:id", async(req, res) => {
 
   } catch (error) {
     console.error("blogs: getOne", error);
-    next(error);
   }
 
 })
@@ -59,19 +67,18 @@ app.get("/blogs/:id", async(req, res) => {
 // CREATE BLOG
 app.post("/blogs/create/", async(req, res) => {
   try {
-    const { title, tag, body, ownerId } = req.body;
+    const { title, tag, body, authorId } = req.body;
     const createBlog =  await BlogEntry.create({
       title,
       tag,
       body,
-      ownerId
+      authorId
     });
 
     res.send(createBlog);
 
   } catch (error) {
     console.error("blogs: createOne", error);
-    next(error);
   }
 
 })
@@ -92,7 +99,6 @@ app.delete("/blogs/delete/:id", async(req, res) => {
  
   } catch (error) {
     console.error("blogs: deleteOne", error);
-    next(error);
   }
 
 })
@@ -100,7 +106,7 @@ app.delete("/blogs/delete/:id", async(req, res) => {
 // EDIT BLOG - not working atm
 app.put("/blogs/edit/:id", async(req, res) => {
   try {
-    const { title, tag, body, ownerId } = req.body;
+    const { title, tag, body, authorId } = req.body;
 
     const editBlog = await BlogEntry.findOne( { where: {id : id} });
     // const oldCopy = await BlogEntry.findOne( { where: {id : id} });
@@ -114,14 +120,13 @@ app.put("/blogs/edit/:id", async(req, res) => {
       title,
       tag,
       body,
-      ownerId
+      authorId
     });
 
     res.send(editBlog);
  
   } catch (error) {
     console.error("blogs: editOne", error);
-    next(error);
   }
 
 })
@@ -131,6 +136,8 @@ app.put("/blogs/edit/:id", async(req, res) => {
 // CREATE USER / sign up
 app.post("/authors/create/", async(req, res) => {
   try {
+    const { username, password } = req.body;
+
     const author = await Author.findOne( { where: {username} });
 
     if (author) {
@@ -138,19 +145,16 @@ app.post("/authors/create/", async(req, res) => {
       return;
     }
 
-    const { username, password } = req.body;
-    const hashedPW = await bycrpyt.hash(password, 8)
-    const newAuthor =  await Author.create({
+    const hashedPW = await bcrypt.hash(password, 8)
+    const {id} =  await Author.create({
       username,
       hashedPW,
     });
     const token = jwt.sign({id, username}, process.env.SIGN_SECRET)
 
-    res.send(newAuthor.username + "has been created, here is your unique token " + token);
-
+    res.send({ message: "New Author created", token });
   } catch (error) {
     console.error("blogs: createOne", error);
-    next(error);
   }
 })
 
@@ -158,7 +162,7 @@ app.post("/authors/create/", async(req, res) => {
 app.post("/authors/login/", async(req, res) => {
   try {
     const { username, password } = req.body;
-    const { id, password: hashedPW } = await User.findOne({
+    const { id, password: hashedPW } = await Author.findOne({
       where: { username },
     });
 
@@ -173,7 +177,6 @@ app.post("/authors/login/", async(req, res) => {
     res.send("Unauthorized");
   } catch (error) {
     console.error("blogs: createOne", error);
-    next(error);
   }
 })
 

@@ -5,8 +5,8 @@ const {blogEntries, authors} = require('./seedData');
 
 const seed = async () => {
   await sequelize.sync({ force: true }); // recreate db
-  await BlogEntry.bulkCreate(blogEntries);
   await Author.bulkCreate(authors);
+  await BlogEntry.bulkCreate(blogEntries);
 };
 
 module.exports = seed;

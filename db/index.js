@@ -3,7 +3,10 @@ const {Author} = require('./Author');
 const {sequelize, Sequelize} = require('./db');
 
 Author.hasMany(BlogEntry);
-BlogEntry.belongsTo(Author, {id: 'ownerId'}); // blogEntry table, there will be an ownerId <- FK
+BlogEntry.belongsTo(Author, {
+    foreignKey: 'authorId',
+    as: 'username'
+  });
 
 module.exports = {
     BlogEntry,
