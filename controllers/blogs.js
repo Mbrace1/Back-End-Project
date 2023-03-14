@@ -3,12 +3,12 @@ const { BlogEntry } = require("../db");
 // CREATE BLOG
 exports.create = async(req, res) => {
     try {
-      const { title, tag, body, authorId } = req.body;
+      const { title, tag, body } = req.body;
       const createBlog =  await BlogEntry.create({
         title,
         tag,
         body,
-        authorId
+        authorId: req.user.id
       });
   
       res.send(createBlog);
@@ -42,7 +42,7 @@ exports.create = async(req, res) => {
   // EDIT BLOG - not working atm
   exports.edit = async (req, res) => {
     try {
-      const { title, tag, body, authorId } = req.body;
+      const { title, tag, body } = req.body;
   
       const editBlog = await BlogEntry.findOne( { where: {id : id} });
       // const oldCopy = await BlogEntry.findOne( { where: {id : id} });
@@ -56,7 +56,7 @@ exports.create = async(req, res) => {
         title,
         tag,
         body,
-        authorId
+        authorId: req.user.id
       });
   
       res.send(editBlog);

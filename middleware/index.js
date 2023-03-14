@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { SIGN_SECRET } = process.env;
+const { SIGNING_SECRET } = process.env;
 
 module.exports.setUser = (req, res, next) => {
   try {
@@ -9,7 +9,7 @@ module.exports.setUser = (req, res, next) => {
       return;
     }
     const [, token] = auth.split(" "); // "Bearer s8u923f09sdf230fhsd32"
-    const user = jwt.verify(token, process.env.SIGN_SECRET);
+    const user = jwt.verify(token, process.env.SIGNING_SECRET);
     req.user = user;
     next();
   } catch (error) {

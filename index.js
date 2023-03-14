@@ -5,7 +5,7 @@ const { Author, BlogEntry } = require('./db')
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { setUser, requiresAuth } = require("./middleware");
-const { SIGN_SECRET } = process.env;
+const { SIGNING_SECRET } = process.env;
 require('dotenv').config()
 buildDB()
 
@@ -14,6 +14,11 @@ app.use(express.urlencoded({extended:true}));
 
 app.use(setUser);
 
+// routes to use authentication
+app.use("/blogs", requiresAuth, require("./routes/blogs"));
+
+app.post("/register", require("./routes/register"));
+app.post("/login", require("./routes/login"));
 
 app.get('/', async (req, res) => {
   try {
@@ -60,12 +65,6 @@ app.get("/blog/:id", async(req, res) => {
   }
 
 })
-
-// routes to use authentication
-app.use("/blogs", requiresAuth);
-
-app.post("/register", require("./routes/register"));
-app.post("/login", require("./routes/login"));
 
 // error handling middleware, so failed tests receive them
 app.use((error, req, res, next) => {
