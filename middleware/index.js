@@ -32,7 +32,7 @@ exports.requiresAuth = async (req, res, next) => {
   }
 };
 
-exports.checkOwner = (req, res, next) => {
+exports.checkAuthor = (req, res, next) => {
   if (req.user.id != req.params.id) {
     return res.status(401).send("Unauthorized");
   }

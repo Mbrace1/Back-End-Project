@@ -13,8 +13,6 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
 app.use(setUser);
-// routes to use authentication
-app.use("/blogs", requiresAuth);
 
 
 app.get('/', async (req, res) => {
@@ -29,7 +27,6 @@ app.get('/', async (req, res) => {
     console.error(error);
   }
 });
-
 
 // GET ALL BLOGS
 app.get("/all-blogs/", async(req, res) => {
@@ -64,121 +61,11 @@ app.get("/blog/:id", async(req, res) => {
 
 })
 
-// CREATE BLOG
-app.post("/blogs/create/", async(req, res) => {
-  try {
-    const { title, tag, body, authorId } = req.body;
-    const createBlog =  await BlogEntry.create({
-      title,
-      tag,
-      body,
-      authorId
-    });
+// routes to use authentication
+app.use("/blogs", requiresAuth);
 
-    res.send(createBlog);
-
-  } catch (error) {
-    console.error("blogs: createOne", error);
-  }
-
-})
-
-// DELETE BLOG
-app.delete("/blogs/delete/:id", async(req, res) => {
-  try {
-    const {id} = req.params;
-    const deleteBlog = await BlogEntry.findOne( { where: {id : id} });
-
-    if (!deleteBlog) {
-      res.send("Blog not found.");
-      return;
-    }
-
-    await deleteBlog.destroy();
-    res.send("This blog was deleted.");
- 
-  } catch (error) {
-    console.error("blogs: deleteOne", error);
-  }
-
-})
-
-// EDIT BLOG - not working atm
-app.put("/blogs/edit/:id", async(req, res) => {
-  try {
-    const { title, tag, body, authorId } = req.body;
-
-    const editBlog = await BlogEntry.findOne( { where: {id : id} });
-    // const oldCopy = await BlogEntry.findOne( { where: {id : id} });
-
-    if (!editBlog) {
-      res.send("Blog not found.");
-      return;
-    }
-
-    await editBlog.update({
-      title,
-      tag,
-      body,
-      authorId
-    });
-
-    res.send(editBlog);
- 
-  } catch (error) {
-    console.error("blogs: editOne", error);
-  }
-
-})
-
-
-// Next want to be able to create a user (sign up) and only create blogs when logged in
-// CREATE USER / sign up
-app.post("/authors/create/", async(req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    const author = await Author.findOne( { where: {username} });
-
-    if (author) {
-      res.send("This username has been taken.");
-      return;
-    }
-
-    const hashedPW = await bcrypt.hash(password, 8)
-    const {id} =  await Author.create({
-      username,
-      hashedPW,
-    });
-    const token = jwt.sign({id, username}, process.env.SIGN_SECRET)
-
-    res.send({ message: "New Author created", token });
-  } catch (error) {
-    console.error("blogs: createOne", error);
-  }
-})
-
-// LOGIN AS USER
-app.post("/authors/login/", async(req, res) => {
-  try {
-    const { username, password } = req.body;
-    const { id, password: hashedPW } = await Author.findOne({
-      where: { username },
-    });
-
-    if (id) {
-      const isMatch = await bcrypt.compare(password, hashedPW);
-      if (isMatch) {
-        const token = jwt.sign({ id, username }, process.env.SIGN_SECRET);
-        res.send({ message: "success", token });
-        return;
-      }
-    }
-    res.send("Unauthorized");
-  } catch (error) {
-    console.error("blogs: createOne", error);
-  }
-})
+app.post("/register", require("./routes/register"));
+app.post("/login", require("./routes/login"));
 
 // error handling middleware, so failed tests receive them
 app.use((error, req, res, next) => {
