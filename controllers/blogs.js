@@ -23,10 +23,15 @@ exports.create = async(req, res) => {
   exports.delete = async (req, res) => {
     try {
       const {id} = req.params;
-      const deleteBlog = await BlogEntry.findOne( { where: {id : id} });
+      const deleteBlog = await BlogEntry.findByPk(id);
   
       if (!deleteBlog) {
         res.send("Blog not found.");
+        return;
+      }
+
+      if (deleteBlog.authorId !== req.user.id) {
+        res.send("You cannot deelte this blog. Authors can only delete their own blogs");
         return;
       }
   
@@ -43,12 +48,17 @@ exports.create = async(req, res) => {
   exports.edit = async (req, res) => {
     try {
       const { title, tag, body } = req.body;
-  
-      const editBlog = await BlogEntry.findOne( { where: {id : id} });
+      const {id} = req.params;
+      const editBlog = await BlogEntry.findByPk(id);
       // const oldCopy = await BlogEntry.findOne( { where: {id : id} });
   
       if (!editBlog) {
         res.send("Blog not found.");
+        return;
+      }
+
+      if (editBlog.authorId !== req.user.id) {
+        res.send("You cannot edit this blog. Authors can only edit their own blogs");
         return;
       }
   

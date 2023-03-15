@@ -4,7 +4,6 @@ const router = require("express").Router();
 
 //CRUD
 router
-  .use("/:id", checkAuthor)
   .post("/", controller.create)
   .put("/:id", controller.edit)
   .delete("/:id", controller.delete);
